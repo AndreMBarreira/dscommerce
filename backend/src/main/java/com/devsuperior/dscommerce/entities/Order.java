@@ -24,18 +24,20 @@ public class Order implements Serializable{
 	private OrderStatus status;
 
 	@ManyToOne
-	@JoinColumn(name = "user_id")
-	private User user;
+	@JoinColumn(name = "client_id")
+	private User client;
 
 	public Order() {
 	}
 
-	public Order(Long id, Instant moment, OrderStatus status, User user) {
+
+	public Order(Long id, Instant moment, OrderStatus status, User client) {
 		this.id = id;
 		this.moment = moment;
 		this.status = status;
-		this.user = user;
+		this.client = client;
 	}
+
 
 	public Long getId() {
 		return id;
@@ -61,12 +63,13 @@ public class Order implements Serializable{
 		this.status = status;
 	}
 
-	public User getUser() {
-		return user;
+	public User getClient() {
+		return client;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+
+	public void setClient(User client) {
+		this.client = client;
 	}
 
 	@Override
