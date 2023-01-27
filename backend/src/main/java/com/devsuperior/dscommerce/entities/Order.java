@@ -3,6 +3,7 @@ package com.devsuperior.dscommerce.entities;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,6 +41,15 @@ public class Order implements Serializable{
 	
 	@OneToMany(mappedBy = "id.order")
 	private Set<OrderItem> items = new HashSet<>();
+
+	public Set<OrderItem> getItems() {
+		return items;
+	}
+	//Important!!!
+	//for each items(OrderItem) x extract product from OrderItem in Item...
+	public List<Product> getProducts(){
+		return items.stream().map(x -> x.getProduct()).toList();
+	}
 
 	public Order() {
 	}
