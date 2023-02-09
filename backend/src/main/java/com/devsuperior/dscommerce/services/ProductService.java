@@ -1,16 +1,19 @@
 package com.devsuperior.dscommerce.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.devsuperior.dscommerce.dto.CategoryDTO;
 import com.devsuperior.dscommerce.dto.ProductDTO;
+import com.devsuperior.dscommerce.entities.Category;
 import com.devsuperior.dscommerce.entities.Product;
+import com.devsuperior.dscommerce.repositories.CategoryRepository;
 import com.devsuperior.dscommerce.repositories.ProductRepository;
 import com.devsuperior.dscommerce.services.exceptions.DatabaseException;
 import com.devsuperior.dscommerce.services.exceptions.ResourceNotFoundException;
@@ -22,7 +25,10 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository repository;
-
+	
+	@Autowired
+	private CategoryRepository categoryRepository;
+	
 	@Transactional(readOnly = true)
 	public ProductDTO findById(Long id) {
 		Product product = repository.findById(id)
@@ -32,17 +38,17 @@ public class ProductService {
 
 	}
 
-	/*
-	 * @Transactional(readOnly = true) public List<ProductDTO> findAll() {
-	 * List<Product> result = repository.findAll(); return result.stream().map(x ->
-	 * new ProductDTO(x)).toList(); }
-	 */
-
 	@Transactional(readOnly = true)
-	public Page<ProductDTO> findAllPage(Pageable pageable) {
-		Page<Product> result = repository.findAll(pageable);
-		return result.map(x -> new ProductDTO(x));
-	}
+	 public List<ProductDTO> findAll() {
+	 List<Product> result = repository.findProductWithCategories(); 
+	 return result.stream().map(x -> new ProductDTO(x)).toList(); 
+	 }
+	
+	/*@Transactional(readOnly = true)
+	 public Page<ProductDTO> findAll(Pageable pageable) {
+	 Page<Product> result = repository.search1(pageable); 
+	 return result.map(x -> new ProductDTO(x)); 
+	 }*/
 
 	@Transactional
 	public ProductDTO insert(ProductDTO dto) {
@@ -83,6 +89,13 @@ public class ProductService {
 		entity.setDescription(dto.getDescription());
 		entity.setPrice(dto.getPrice());
 		entity.setImgUrl(dto.getImgUrl());
+		
+		entity.getCategories().clear();
+
+		for (CategoryDTO catDto : dto.getCategories()) {
+			Category category = categoryRepository.getReferenceById(catDto.getId());
+			entity.getCategories().add(category);
+		}
 
 	}
 }
